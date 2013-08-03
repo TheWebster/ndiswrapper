@@ -72,7 +72,7 @@ static void module_cleanup(void)
 static int __init wrapper_init(void)
 {
 #ifdef TAINT_OOT_MODULE
-	add_taint(TAINT_OOT_MODULE);
+	add_taint(TAINT_OOT_MODULE, LOCKDEP_STILL_OK);
 #endif
 	printk(KERN_INFO "%s version %s loaded (smp=%s, preempt=%s)\n",
 	       DRIVER_NAME, DRIVER_VERSION,

@@ -575,7 +575,7 @@ static int load_user_space_driver(struct load_driver *load_driver)
 	} else {
 		printk(KERN_INFO "%s: driver %s (%s) loaded\n",
 		       DRIVER_NAME, wrap_driver->name, wrap_driver->version);
-		add_taint(TAINT_PROPRIETARY_MODULE);
+		add_taint(TAINT_PROPRIETARY_MODULE, LOCKDEP_STILL_OK);
 		EXIT1(return 0);
 	}
 }
