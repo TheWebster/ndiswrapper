@@ -1,0 +1,93 @@
+The instructions below explain how to install ndiswrapper. This is
+rather short version; more details about installation,
+troubleshooting, FAQ etc. can be found in the Wiki at
+
+http://ndiswrapper.sourceforge.net/wiki
+
+Prerequisites
+=============
+
+You need a recent kernel, at least 2.6.14, with header files for the
+kernel. Make sure there is a link to the kernel source from the modules
+directory. The command
+
+  ls /lib/modules/`uname -r`/build
+
+should have at least 'include' directory and '.config' file.
+
+Downloading
+===========
+
+Download the latest version of the ndiswrapper sources from here and
+extract it with the command
+
+  tar zxvf ndiswrapper-version.tar.gz
+
+This will create ndiswrapper-version directory. Change to that
+directory and run
+
+  make uninstall
+  make
+
+Login as root and run
+  make install
+
+Install Windows driver
+======================
+
+If this is the first time you install ndiswrapper, you need to install
+Windows driver for Windows XP (in some cases Windows NT or Windows
+2000 may also work). First, get a Windows driver that is known to
+work. See http://ndiswrapper.sourceforge.net/wiki/List for status
+about the device for which you are installing Windows driver. For
+this, you need to identify device ID with
+
+  lspci -nn
+
+if it is PCI device or
+
+  lsusb
+
+if it is USB device.
+
+Then lookup in that List for the device ID and if a driver is known to
+work, get that driver. Occasionally, Windows driver on the CD or your
+Windows partition may work, but if it doesn't, don't complain - get a
+known-to-work driver.
+
+Many Windows drivers are distributed either as zipped files or cab
+files. Zipped files, even if they are .exe files, can be extracted
+with 'unzip' in Linux; cab files can be extracted with combination of
+'cabextract' and 'unshield' programs.
+
+Once the driver has been unpacked, locate .inf and .sys files. If
+necessary, move these files so both .inf and .sys are in the same
+directory. Some drivers also come with firmware files, such as
+fwrad16.bin etc. These files also should be in the same
+directory. Then install the Windows driver with
+
+  ndiswrapper -i driver.inf
+
+This installs .inf file and required .sys and .bin files. Now, see if
+installation of Windows driver is "valid" with
+
+  ndiswrapper -l
+
+This should report
+
+"driver present, hardware present"
+
+for the driver installed and if that driver is for the device that is
+already in the system. If device is not present, it should report
+
+"driver present"
+
+If not, the Windows driver has not been installed properly.
+
+Now load ndiswrapper module with
+
+  modprobe ndiswrapper
+
+If everything worked properly, this should initialize 'wlan0' wireless
+device, which can be configured with wireless tools, such as
+'iwconfig', 'wpa_supplicant' etc.

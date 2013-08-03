@@ -1,0 +1,42 @@
+What is it?
+===========
+
+Some vendors do not release specifications of the hardware or provide
+a Linux driver for their wireless network cards. This project provides
+a Linux kernel module that loads and runs NDIS (Windows network driver
+API) drivers supplied by the vendors
+
+Status
+======
+
+Many cards work; see
+http://ndiswrapper.sourceforge.net/wiki/index.php/List
+for details.
+
+Installation
+============
+
+See INSTALL for a short version of installation instructions. More
+up-to-date instructions, as well as FAQ etc., can be found at
+http://ndiswrapper.sourceforge.net/wiki/index.php?Installation.
+
+Problems
+========
+
+Read documentation at http://ndiswrapper.sourceforge.net/wiki.
+
+Before sending bug reports, please check archives of mailing list and
+public forum available at project home page:
+http://ndiswrapper.sourceforge.net. Both these have search facility.
+Follow the instructions below when sending a bug report:
+
+   * Recompile with 'make DEBUG=3' and reload ndiswrapper module.
+     Report dmesg output. Without this step, proper feedback may not be
+     possible.  Include details about your card, chipset (reported by lspci),
+     distribution, kernel version in the post.
+
+   * Check if latest SVN works.
+
+   * Use an alternate windows driver; see the link in Status section above
+     for a driver that is known to work for your chipset. You may also
+     find more information in the Wiki.

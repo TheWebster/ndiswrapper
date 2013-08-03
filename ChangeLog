@@ -1,0 +1,690 @@
+Version 1.58 2013-02-19
+=======================
+* Added support for Linux kernels up to 3.8
+
+Version 1.57 2011-12-31
+=======================
+* Added support for Linux 2.6.35 - Linux 3.1
+* Kernels as old as 2.6.14 are now supported
+* IW_AUTH_MFP implemented
+* Reserve stack before copying arguments when calling from Windows to Linux
+  on x86_64
+* Fixed memory corruption on module unload seen with Atheros and Marvell USB
+  devices
+* Fixed a kernel panic if there are many devices for one driver and one
+  fails to initialize
+* Fixed support for AVM Fritz USB
+* Loading drivers with unknown symbols is disallowed, it's a certain crash
+* Fixed some memory leaks
+* Memory usage information has been improved
+* Fixed procfs registration if the network device is renamed
+* Added more function stubs
+* Build system improved
+* Code cleanup, fixed many warnings, style issues and typos
+
+Version 1.56 2010-02-10
+=======================
+* Fixed compilation with 2.6.31 and newer on i386
+* Use /etc/modprobe.d/ndiswrapper.conf, not /etc/modprobe.d/ndiswrapper.
+
+Version 1.55 2009-06-28
+=======================
+* Fixed compilation issues with recent kernels
+
+Version 1.54 2009-01-21
+=======================
+* Fixed buffer overflows with nickname
+* Compilation issues with 2.6.27 and 2.6.28 fixed
+
+Version 1.53 2008-05-17
+=======================
+* Implemented va_list conversion for x86_64, which fixes oops in
+  vsprintf() and vsnprintf().
+* Fixed oops on unload if using our workqueue implementation with SMP enabled.
+* Don't change the actual thread priority, just pretend it was changed.
+* Implemented format string conversion for x86_64, so that Windows long
+  is mapped to Linux int.
+* Fixed most sparse warnings.
+* Simplified code and build system to remove already broken support for
+  Linux versions prior to 2.6.16.
+* Added .size and .type for all functions in win2lin_stubs.S to improve
+  backtrace on x86_64.
+* Fixed rx key authentication sequence number conversion from Windows to
+  Linux so WPA authentication doesn't sometimes go into re-key auth loop.
+
+Version 1.52 2008-02-02
+=======================
+* Fixed kernel crash when CONFIG_DEBUG_SHIRQ is enabled
+* Compilation issues with current 2.6.25 kernel tree fixed
+
+Version 1.51 2007-12-17
+=======================
+* Fixed an SMP issue that may cause ndiswrapper to stop transmitting packets
+  after a while (noticed with Marvell Pre-N USB driver)
+
+Version 1.50 2007-11-27
+=======================
+* Added support for 2.6.24-rcX kernels
+* Fixed issue with changing mac address (with 'ifconfig <iface> hw ether
+  <mac>') - its broken since 1.45-rc2. Now one can also edit appropriate .conf
+  file to set the NetworkAddress setting to whatever mac address should be
+  used by the driver (e.g., NetworkAddress|0123456789ab)
+* Fixed kernel crash observed with mrv8335 in ad-hoc mode
+
+Version 1.49 2007-10-27
+=======================
+* If a driver returns invalid MAC address (00:00:00:00:00) when
+  queried with OID_802_3_CURRENT_ADDRESS (probably because
+  NdisReadNetworkAddress returns NDIS_STATUS_FAILURE?), use
+  OID_802_3_PERMANENT_ADDRESS to get the correct address. This is required for
+  some Atheros devices (e.g., AR5007EG)
+* Fixed a kernel crash with non-preempt kernels (observed with acx111 driver)
+* Preemption, as required by Windows, has been reimplemented. With this,
+  ndiswrapper works with RT-preempt and non-preempt kernels
+* Dropped support for 2.4 kernels (and very old 2.6 kernels)
+
+Version 1.48 2007-09-19
+=======================
+* Support for 2.6.23 kernel
+* Disassociation with wpa_supplicant is fixed (earlier, after disassociation,
+  the driver and ndiswrapper would be configured differently, requiring
+  unloading and reloading of ndiswrapper module)
+* (Re)Association / (Re)Authentication issues with wpa_supplicant with
+  2.6.23 kernels fixed
+* Fixed an issue with 64-bit Broadcom drivers that cause ntos_wq worker thread
+  to take up all the CPU in some cases
+
+Version 1.47 2007-06-12
+=======================
+* Fixed random (occasional) crash issues with 64-bit drivers (observed with
+  Broadcom driver)
+* Fixed compilation issues with version 1.46
+
+Version 1.46 2007-06-03
+=======================
+* Fixed crash with large transfers (bug in version 1.45)
+
+Version 1.45 2007-05-28
+=======================
+* Fixes 'NOHZ: local_softirq_pending: 08' warnings from tickless
+  kernels
+* Fixed issue(s) with RT-preempt enabled kernels
+* Fixed ndiswrapper script to handle installation of Intel 4965AGN
+  driver (which apparently works with ndiswrapper)
+* Fixed a warning when SLUB allocator is used
+* Fixed kernel crash with PsCreateSystemThread that manifested with
+  sis163u when preempt is enabled
+* Changing MAC address with 'ifconfig <iface> hw ether' should work
+  with all drivers now. If MAC address should be changed every time
+  ndiswrapper is loaded, change 'NetworkAddress' setting, as explained
+  in wiki entry 'Tips' (earlier 'mac_address' setting was used, but
+  that no longer applies)
+* Fixed an issue with some drivers (e.g., sis163u) that would stall
+  after working for a while
+* Fixed crashes when removing module with USB devices
+
+Version 1.44 2007-05-17
+=======================
+* Fixed issues with Ubuntu kernels (where PREEMPT is not enabled)
+* Issues with combination of DEBUG_PREEMPT and RT-preempt fixed
+* Fixed issues with newer 64-bit Broadcom driver when more than 1GB RAM is
+  present
+* Added support for upcoming 2.6.22 kernels
+
+Version 1.43 2007-04-30
+=======================
+* Fixed long standing memory allocation issues with some
+  drivers, Atheros especially. With this fix, Atheros cards in MacBook
+  with Core 2 Duo are known to work
+* The above fix changes core architecture of ndiswrapper and improves
+  memory allocation issues with all drivers, as well as executes
+  mostly with bottom-half's enabled for better system response and
+  performance. Many drivers have been tested to work with these
+  changes; however, some drivers may have been broken
+* Added support for Marvell Gigabit ethernet drivers (apparently
+  in-kernel sky2 driver has some issues)
+
+Version 1.42 2007-04-16
+=======================
+* Yet another SMP fix
+* Bug fix related to events (no driver seems to be affected by this)
+
+Version 1.41 2007-03-31
+=======================
+* Fixed soft-lockup issue when multiple network devices are used
+* Fixed a bug when unloading driver
+* Fixed issues with recent RT-preempt patch
+
+Version 1.40 2007-03-29
+=======================
+* The workaround for large memory allocations (needed by Atheros drivers)
+  with 2.6.19+ kernels, introduced in version 1.33, causes soft-lockup
+  with SMP. This is now fixed.
+
+Version 1.39 2007-03-23
+=======================
+* An SMP issue is fixed
+* When initializing a card that supports 802.11a and either 802.11g or b, set
+  the mode to 802.11g or b, as 802.11a is far less common
+* Added support for driver for Atheros device with PCI ID 168C:1014
+* Fixed issue with initializing athfmwdl driver (for Atheros USB cards)
+
+Version 1.38 2007-02-28
+=======================
+* Fixed ndiswrapper script so it installs drivers for certain PCMCIA cards
+  (which have bus type 8, instead of 5)
+* Fixed compilation issues with 2.4 kernels
+
+Version 1.37 2007-02-02
+=======================
+* This time, really fixed the ndiswrapper script for sis163u driver (wrong
+  version was packaged with 1.36, although issue was fixed in svn a few days
+  ago)
+
+Version 1.36 2007-02-01
+=======================
+* Fixed ndiswrapper script (broken since 1.23 for sis163u driver)
+* Implemented full scatter/gather lists (not tested)
+* Implemented support for hardware TCP/IP checksumming (through NDIS)
+
+Version 1.35 2007-01-28
+=======================
+* Fixed a bug with scatter/gather. With this rt61 from RaLink and VT6655 from
+  VIA drivers transmit data. Other drivers that associated but didn't transmit
+  data (e.g., RT8855, Airgo's Gen3 PCI with ID 17CB:0002) may also work.
+
+Version 1.34 2007-01-08
+=======================
+* Provide workaround for large memory allocations in interrupt context with
+  2.6.19+ kernels. With this, Atheros (and other?) drivers don't need kernel
+  to be patched.
+
+Version 1.33 2006-12-28
+=======================
+* Allow large memory allocations in older kernels; with 2.6.19 and newer
+  kernels, vmalloc in atomic allocations is not allowed (see 'patches' section
+  on project page for workaround on these newer kernels).
+
+Version 1.32 2006-12-23
+=======================
+* Added compatibility with 2.6.20-rc1 kernel
+* Fixed crash when changing MAC address (with 'ifconfig hw ether')
+* Fixed crash when names of other network device are changed (e.g., by udev)
+
+Version 1.31 2006-12-05
+=======================
+* Fixed crashes with shutting down computer without unloading ndiswrapper
+  module.
+* Added support for Davicom 9601 USB ethernet device.
+* Fixed ndiswrapper script to show correct device IDs.
+
+Version 1.30 2006-11-28
+=======================
+* Yet another fix to ndiswrapper script (to handle file names with upper case
+  extensions).
+
+Version 1.29 2006-11-23
+=======================
+* Fixed ndiswrapper script to handle INF files properly.
+* Added support for Atheros 5416 (802.11n) chipset.
+
+Version 1.28 2006-10-29
+=======================
+* Windows drivers may request firmware to be loaded in either upper or lower
+  case (either full name or partially). Instead of using given name, use
+  installed name. This fixes firmware loading issue with Airgo networks
+  driver.
+* When compiling with 2.6.19-rc2 and possibly next rc(s), compile with
+  'make USE_OWN_WQ=1'. Final 2.6.19 may not need this (hopefully).
+
+Version 1.27 2006-10-21
+=======================
+* Bug fix to drivers that load binary firmware files (broken in 1.26). This
+  fixes issues with Atheros and TI drivers.
+* Atheros PCI driver requests more map registers for DMA than limit specified
+  in NDIS. Instead of failing such invalid requests, continue.
+
+Version 1.26 2006-10-14
+=======================
+* Removed debug flag in ndiswrapper script
+* When HIGHMEM is enabled, allocate and copy URB buffers only if
+  necessary. This prevents memory allocation failures.
+
+Version 1.25 2006-10-04
+=======================
+* Support for WE-21
+* Bug fixes
+
+Version 1.24 2006-10-01
+=======================
+* Compilation issues with 2.4 fixed (yet again!)
+* Devices are recognized when they are inserted, instead of registering when
+  module is loaded. With this, new Windows drivers can be installed / updated
+  without unloading ndiswrapper module, and any number of Windows drivers can
+  be installed without overhead.
+* Minor tweaks and optimizations
+* Fixed issues with RT-Preempt patch
+* 64-bit RT2500 USB driver works
+
+Version 1.23 2006-08-10
+=======================
+* Bug fixes to recent changes in 64-bit driver support.
+* ZyDas ZD1211 driver uses interrupt-out URBs, so set them up properly.
+* Bug fixes to Atheros USB driver support.
+
+Version 1.22 2006-08-05
+=======================
+* Added support for Broadcom 802.11n (draft) driver
+* Added support for 64-bit Marvell driver
+* Optimizations for 64-bit drivers
+* If network interface name changes (through udev, ifrename etc),
+  ndiswrapper notices it and changes entry in procfs
+* Compilation issue with 2.4 issue fixed
+
+Version 1.21 2006-07-15
+=======================
+* Fix to a bug (in 1.20) that locked up when used with RT2500 with SMP.
+* RT2500 is supported with 64-bit.
+
+Version 1.20 2006-07-15
+=======================
+* Fixes to 64-bit drivers; TI 1450 (used in AVM Fritz) is supported with 64-bit.
+* Fix to SMP kernel crash when USB device is unplugged.
+
+Version 1.19 2006-07-02
+=======================
+* Calls to Miniport functions with serialized drivers (such as RT2500) are
+  serialized, so they should work with SMP.
+* Enable interrupts in IRQ handler; otherwise, some drivers (e.g., Marvell
+  8335) don't work.
+* Kernel crash with changing mac address (with 'ifconfig hw ether ...') fixed.
+
+Version 1.18 2006-06-22
+=======================
+* Kernel crash with RT2500 (and possibly other serialized drivers) under heavy
+  traffic load fixed.
+* Support for RNDIS driver with Vista drivers for 64-bit added.
+
+Version 1.17 2006-06-04
+=======================
+* netpoll support added; with this netconsole can be used with ndiswrapper.
+* Suspend/resume improved: Until now devices are halted (which is similar to
+  removing the device) during suspend and initialized during resume. Now,
+  if a driver supports suspend and resume, that is used instead. With this,
+  any wireless settings, such as encryption, may be preserved by the driver.
+* Support for RNDIS was broken in 1.16; they work now.
+
+Version 1.16 2006-05-06
+=======================
+* Compilation issues 2.4 kernels fixed.
+* Support for lck patchset (Con Kolivas's preempt patch) for 2.4 kernels added.
+* Added workqueue functions for 2.4 kernels so drivers that need more
+  than one workqueue work.
+* Added support for more USB devices with 2.4 kernels (so far, devices
+  which use interrupt URBs, such as ZyDas ZD1211, didn't work; now
+  some of them do).
+
+Version 1.15 2006-04-26
+=======================
+* Memory allocation tracking support added; this should help find any
+  memory leaks (with ALLOC_INFO and ALLOC_DEBUG options to 'make').
+* Proper fix for drivers (Atheros PCI and USB drivers) allocating
+  large chunk of memory in atomic context.
+* Fix for crash when module is removed with new Atheros USB driver,
+  which supports WPA2 and has no firmware driver (athfmwdl).
+* Memory leaks plugged.
+* Wireless statistics are enabled (inadvertently disabled in version 1.14).
+* Suspend/resume issues fixed - all devices, including USB devices,
+  should work with suspend/resume.
+* Plugging/unplugging/rmmod issues fixed; Marvell devices don't need
+  to be unplugged before removing module.
+
+Version 1.14 2006-04-17
+=======================
+* Added support for Xpeed X400 ADSL adapter.
+* Only wireless devices will be registered as wireless devices to
+  kernel; others (e.g., X400 ADSL) will be registered as network
+  devices, by default, with wlan%d.
+* Issues with multicast fixed.
+* Issues with ZyDas ZD1211 fixed (broken since 1.9 or so).
+* Fixed memory corruption issues, discovered with CONFIG_DEBUG_SLAB.
+
+Version 1.13 2006-04-08
+=======================
+* Compilation issues with older kernels fixed.
+* SMP issues fixed; Netgear WG111 USB (Prism54 chipset) works with SMP.
+* Association to open networks (without encryption) is supported with 'wext'
+  driver interface with wpa_supplicant.
+* Workaround is provided for Atheros driver so large block of memory
+  allocated by this driver in atomic context succeed.
+
+Version 1.12 2006-04-04
+======================
+* Sis163 USB driver with version 1.11 failed to associate reliably. This is
+  fixed.
+* TI 1450 USB driver failed to initialize card if module is reloaded. This is
+  fixed.
+* WPA with TKIP with TI ACX100 driver now works with 'ap_scan=2' in
+  wpa_supplicant's configuration file. Driver for D-Link DWL-650+ has support
+  for WPA with TKIP for this chipset.
+* Added support for non-encrypted networks with wpa_supplicant.
+* Am1772 with WPA and TKIP authenticates reliably now.
+* Compilation issue with 2.4 kernels fixed.
+* Added support for WEP with wpa_supplicant through 'wext' driver
+  interface. There is no need for 'ndiswrapper' interface with wpa_supplicant
+  anymore.
+* Fixed an issue with 64-bit USB drivers. No 64-bit USB driver is known to
+  work, though.
+
+Version 1.11 2006-03-25
+======================
+* Added support for newer RNDIS (USB) cards (e.g., USR5421, F5D7051uk,
+  WUSB54GSv2, all based on Broadcom chip). These support WPA2, whereas
+  older RNDIS cards support only WPA.
+* Kernel crash when removing USB cards fixed.
+* Fixed performance issues with SMP.
+* Added support for AMD Am1772.
+
+Version 1.10 2006-02-11
+======================
+* Added support for 64-bit USB drivers. Not tested with any driver,
+  though.
+* Bug fixes.
+
+Version 1.9 2006-02-03
+======================
+* Added support for real-time preempt (RT) patch.
+* Added support for TNETW1450 (TI's USB chipset).
+* Added support for latest Windows Broadcom driver.
+* Added support for Airgo Networks MIMO Pre-N driver.
+* Added support for Intel PRO/Wireless 3945ABG driver; this driver needs 16KB
+  stacks in kernel.
+* Bug fixes.
+
+Version 1.8 2006-01-16
+======================
+* Issue with WEP with wpa_supplicant fixed (keys must be saved and
+  restored).
+* Support for newer kernels added.
+* If USB support is not required, passing 'DISABLE_USB=1' option to
+  'make' will not include USB layer (introduced in version 1.5, but
+  broken in at least 1.7).
+* Crash when removing ndiswrapper module with certain Windows drivers
+  fixed.
+
+Version 1.7 2005-12-07
+======================
+* Support for Atheros USB drivers natively (without the need for
+  load_fw_ar5523 user space firmware layer introduced in 1.6 release) added.
+* Drivers and driver files are dynamically loaded and unloaded as and when
+  necessary; this should save memory.
+* Bug fixes / improvements.
+
+Version 1.6 2005-11-29
+======================
+* Support for Highmem with USB devices added.
+* Bulk and interrupt URBs were being mixed up in earlier releases - this issue
+  is fixed.
+* Crashes due to 'divide by zero' error in update_wireless_stats fixed.
+* Added support for Atheros USB drivers including RangeMAX MIMO. This
+  requires loading ar5523.bin firmware file with user-space tool
+  load_fw_ar5523 in utils.
+* Suspend and resume support improved; USB devices should now be able
+  to suspend and resume.
+* Bug fixes.
+
+Version 1.5 2005-10-30
+======================
+* SMP issues fixed.
+* Zero-copy for sending packets implemented.
+* It is possible to compile ndiswrapper even if USB is not enabled in
+  kernel, without support for USB devices.
+* Even if USB is enabled in kernel, ndiswrapper can be compiled with
+  'make DISABLE_USB=1' to disable support for USB devices.
+* If a device doesn't resume properly (from suspend), de-initialize
+  device so it can be initialized later. This fixes issue with
+  suspend/resume with Marvell driver.
+* Issues with WUSB11v4 (Ali chipset) fixed.
+* Rtl string functions have been reimplemented.
+* Resume from suspend works with Marvell chipset 8335.
+
+Version 1.4 2005-10-06
+======================
+* WPA2 support added.
+* Implemented most of IO manager, PnP manager and Obj manager.
+* No need to update utils every time ndiswrapper is updated but only when utils
+  interface changes.
+* USB layer has been rewritten with many fixes; e.g., USB devices no
+  longer disconnect unexpectedly.
+* New devices supported: sis162, sis163, ZyDas 1211, Linksys WUSB11v4
+  (with Ali chipset). These are USB devices.
+* Unplugging USB devices without removing ndiswrapper module
+  supported.
+* USB devices work with PREEMPT enabled.
+* Separate workqueue is used in 2.6 kernels; this should prevent
+  locking up keyboard etc. in case of kernel crash.
+* Support for new kernels added.
+* Many bug fixes.
+* Added support for Inprocomm IPN2220 with 64-bit.
+* Added support for RNDIS USB devices (tested with U.S. Robotics
+  USR5420).
+* Issue with unloading module with some drivers (e.g., sis and
+  Inprocomm ipn2220) fixed.
+* Issue with WPA with sis162u, sis163u and ZyDas zd1211 fixed.
+* Initialization failure with WUSB54v1 fixed.
+
+Version 1.2 2005-06-10
+======================
+* Support for NX (no-execute) bit
+* 64-bit Broadcom driver works with HIGHMEM.
+* Implemented I/O manager and Object layers.
+* Many bug fixes
+
+Version 1.1 2005-03-04
+======================
+* Free kmem_cache of MDLs; this fixes crashes when removing module.
+* Yet another spinlock (re)implementation. We don't use Linux spinlocks to
+  implement Windows spinlocks anymore - ndiswrapper implements new spinlock
+  functions that use Windows spinlock variables directly.
+* Use kmem_cache pools for MDL (aka NDIS_BUFFER) and NDIS_PACKET structures
+  which are allocated often. This should reduce memory fragmentation.
+* Use MDL functions when initializing ndis_packet while sending packets. This
+  fixes crashes with Fedora kernels (and amd64 driver at least).
+* Memory leak with 64-bit Broadcom driver fixed
+* Crash when module is removed with Marvell driver fixed
+* In some cases, a Windows driver loads successfully, but ndiswrapper
+  concludes otherwise. This is fixed.
+* Don't use spinlocks unless CONFIG_SMP or CONFIG_DEBUG_SPINLOCK is
+  enabled.
+* Don't reset Centrino cards during initialization as this seems to
+  turns off radio.
+* 2.4 kernels don't have hashing, so provide wrapper macros for hashing.
+* Set the active/transmit key index as given, instead of assuming 1
+  always. This fixes authentication with Cisco routers. This should
+  also fix WEP issues when active key used on the router is at index > 1.
+* NdisAcquire(Dpr)SpinLock obtains the lock at DISPATCH_LEVEL instead
+  of PASSIVE_LEVEL. This fixes PREEMPT and SMP issues with some drivers.
+* Issue with Prism54 driver sometimes crashing kernel when scanning fixed.
+* Added private ioctl to set the network type to a specific type. Use
+  "iwpriv wlan0 network_type <char>" to set the network type to what <char>
+  represents, where <char> is one of a, b, g or any other character.
+  For example, to set to 802.11b, use "iwpriv wlan0 network_type b",
+  and to set to auto, "iwpriv wlan0 network_type x".
+
+Version 1.0 2005-01-29
+======================
+* Yet another spinlock reimplementation. Since I don't have SMP, it is taking
+  lot of time (and effort) to get it working.
+* With new spinlock implementation, CONFIG_DEBUG_SPINLOCK option can be
+  enabled in the kernel.
+* WavePlus 1200 chipset supported.
+* Works with some vendor kernels that use different semantics (from vanilla
+  kernels) for PCI/USB register functions.
+* Don't free memory allocated for 'devices' twice (which was causing kernel
+  crash) when device registration failed.
+* Don't set infrastructure mode in wpa_associate, which clears the keys.
+  With this, WEP should work again with wpa_supplicant.
+* Fix (small) memory leak - free xmit_array when device is removed.
+* Use spinlock when calling any miniport function. This may fix some SMP
+  issues.
+* Preliminary support for AMD64 (tested with Broadcom chipset)
+* Dynamic loader support: A driver is loaded only when necessary, so
+  even if many drivers are installed or if a driver installs many
+  .conf files (e.g., Centrino), only drivers and device configurations
+  necessary are loaded.
+* Set RadioState used by Broadcom drivers to 0, instead of 1. This
+  turns on radio (although name suggests the other way round).
+* Bug fixes
+* Workaround for CONFIG_DEBUG_SPINLOCK, but this option is discouraged
+* task_nice is not used anymore, so should compile with kernels where
+  this is not exported
+* More spinlock correction. Some drivers are reported to work with
+  SMP. Not all drivers may work (at least Prism54 USB driver seems to
+  be buggy)
+* Spinlock rewrite: This time SMP should work. Really.
+* Sends multiple packets (if driver supports it) in each send
+  operation for better efficiency
+* Most of the functionality of loader is moved to userspace tool
+  loadndisdriver so it is more robust
+* Encryption info is restored during disassociation; this is useful if
+  ad-hoc mode is used as pseudo master mode
+* MAC address can be set in .conf files (in /etc/ndiswrapper/<driver>
+  directory) or changed at any time (with 'ifconfig hw class' command)
+* Association and disassociation should happen quickly especially with
+  wpa_supplicant
+* Compilation issues with old gcc and sed are fixed
+* Kernel crash when ejecting cards with cardctl in 2.4 kernels is
+  fixed
+
+Version 0.12 2004-11-25
+=======================
+* Works with Preempt and SMP kernels.
+* WPA-RADIUS is supported.
+* Compiles with kernels > 2.6.9 and swsuspend2
+* USB cards are reset during initialization; they should work without
+  having to reset explicitly
+* Some crashes in USB, especially during initialization, are fixed.
+* WEP key setting problems fixed.
+* Check for 4K stack size during compilation and issue warning if necessary.
+* Bug fixes
+
+Version 0.11 2004-10-08
+=======================
+* Compilation issues with USB are fixed.
+* WPA issues fixed.
+* Older Prism USB devices (e.g., D-Link DWL-122, Netgear MA111) supported.
+* Suspend/resume of devices with no power management (e.g., TI) fixed.
+* ndiswrapper script has an option "-d" to install drivers for a
+  different device (if the chipset is same); the script also installs
+  drivers properly when the CopyFiles section has commented out file names.
+* ndiswrapper script lists USB devices and reports status of drivers
+  with more understandable messages.
+* Many bug fixes and improvements
+
+Version 0.10 2004-08-20
+=======================
+* Centrino 2200: works in ad-hoc mode, keyboard doesn't lock even
+  when there is no power to the card, suspend/resume works, restricted
+  mode encryption works
+* SMP should work again
+* USB cards are supported (only Linksys WUSB54G tested with 2.6.7 kernel)
+* From now on, utils should be installed along with the module - newer version
+  of module doesn't work with older version of utils
+* hangcheck_interval option is no longer required; this option may be dropped
+  in future versions
+* suspend/resume work with procfs interface: e.g., to suspend
+    echo suspend=3 > /proc/net/ndiswrapper/wlan0/settings
+  and to resume
+    echo resume > /proc/net/ndiswrapper/wlan0/settings
+
+Version 0.9 2004-08-05
+======================
+* Wi-Fi Protected Access (WPA) is supported with both AES/CCMP and TKIP
+  encryption
+* Debian packages can be built with 'make deb'; RPMs can be built with
+  'make rpm'
+* Support for RT2400/RT2500 chipset
+* ndiswrapper script can be used to install INF files in Unicode
+* Private ioctl to change power profile to AC/Battery
+* Many bug fixes
+
+Version 0.8 2004-06-10
+======================
+* Support for 802.1x (multiple WEP keys).
+* Support for more chipsets/cards (DWL-G630, Marvell W8100, Atheros 5211,
+  Atheros 5212).
+* Many bug fixes (scanning, DMA aka shared memory allocation, timers, IRQs,
+  spinlocks, memory allocation, serialized drivers).
+* Added hangcheck_interval module option to either disable it (some Realtek
+  drivers seem to have problems with it) or force it to any given value.
+
+Version 0.7 2004-04-23
+======================
+* Power down while unloading the module, so it saves trees!
+* Fixed a bug with scanning; earlier it would fail sometimes.
+* procfs exposes multiple cards, if present.
+* Fixed problems with unloading of module in some cases.
+* Realtek 8180L is supported.
+* Support for more cards/chips (see "Supported Chipsets" page for details).
+* Many bug fixes!
+
+Version 0.6 2004-03-17
+======================
+* Support for kernels with CONFIG_REGPARM.
+* SMP problem with Centrino driver fixed.
+* essid problems with WEP enabled on Centrino fixed.
+* Compiles on 2.4 kernels with old ethtool.
+* Support for SMC2802 V2 card.
+* Support for 3Com 3CRSHPW796 card.
+* Support for TI AC111 card.
+
+Version 0.5 2004-03-08
+======================
+* Integrated RPM packaging.
+* Better makefiles.
+* New simpler installation.
+* Better support for multiple driver and cards.
+* Compiles on some more kernels.
+* Suspend/resume follow new power management driver model and work with S3/S4.
+* Power up the card during initialization so ndiswrapper works if the card is in
+  powered down state.
+* Background AP scanning is removed, so it doesn't affect IP traffic anymore.
+* WEP key and essid can be set in any order, not necessarily key first and
+  essid later.
+* Essid is set twice with a delay in between so that it gets set properly
+  the first time after the machine is booted.
+* A new util for controlling the radio for Averatec 5110HX laptop added.
+
+Version 0.4 2004-01-05
+======================
+* Admtek chipset works, including WEP.
+* Performance issues on Centrino have been fixed.
+* Removing the module doesn't give oops anymore.
+* Power management (suspend/resume) works reliably.
+* procfs interface is added.
+* Removed unnecessary 64 bit and floating point operations.
+
+Version 0.3 2003-12-16
+======================
+
+* Centrino now works with some drivers.
+* Unified makefile in driver directory for easier compiling.
+* SMP fixes (not 100% complete yet).
+* Support for Atheros AR5004 drivers.
+* Taint kernel when loading windows driver.
+
+Version 0.2 2003-12-04
+======================
+
+* New inf file parser.
+* Access point scanning.
+* WEP support.
+* Byte statistics for ifconfig.
+* Kernel 2.4 support.
+* Support for more Broadcom cards (No Centrino yet).
+* Tons of bugfixes should improve stability a lot.
+
+Version 0.1 2003-11-17
+======================
+
+* Initial release.

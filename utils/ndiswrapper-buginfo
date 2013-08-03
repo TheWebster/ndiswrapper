@@ -1,0 +1,152 @@
+#!/bin/sh
+#set -ex
+
+# Copyright (c) 2004 Torbjörn Svensson <azoff@se.linux.org>.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+LOGFILE=`mktemp /tmp/ndiswrapper.XXXXXX`
+KVERS=`uname -r`
+
+log()
+{
+    echo -e "$*" 2>&1 >> $LOGFILE
+}
+
+log_cmd()
+{
+    /bin/sh -c "$*" 2>&1 >> $LOGFILE
+}
+
+newblock()
+{
+    log "------------------------------------\n"
+}
+
+if [ $# -eq 1 -a "$1" = "-full" ]; then
+    FULL=1
+else
+    FULL=0
+fi
+
+# utils
+log "utils:"
+log_cmd 'ls -l /sbin/loadndisdriver'
+log_cmd 'ls -l /usr/sbin/ndiswrapper'
+
+# the kernel
+newblock
+log "kernel:"
+log_cmd 'cat /proc/version'
+if [ -d /lib/modules/$KVERS/build/include ]; then
+    log "kernel sources are in /lib/modules/$KVERS/build"
+else
+    log "kernel sources missing"
+fi
+
+newblock
+log "module information:"
+log_cmd 'modprobe -c | grep ndis'
+log "module(s):"
+log_cmd "find /lib/modules/$KVERS/ -name ndiswrapper\* | xargs ls -l"
+log ""
+
+# the version of gcc
+newblock
+log "gcc --version:"
+log_cmd 'gcc --version'
+
+newblock
+log "ndiswrapper -v:"
+log_cmd 'ndiswrapper -v'
+
+# installed drivers
+newblock
+log "installed drivers:"
+log_cmd 'ls -lR /etc/ndiswrapper'
+
+while :; do
+    echo "Is it okay to shutdown 'wlan0' interface and reload the module?"
+    echo "If loading the module crashes kernel, then say N here"
+    echo -n "Reload ndiswrapper module? [N/y]:"
+    read res
+
+    # default to N, (nothing entered)
+    if [ "$res" == "" ]; then
+	res="N"
+    fi
+
+    case $res in
+	y|Y)
+	    log "Reloading ndiswrapper..."
+	    if [ $FULL -eq 1 ]; then
+		log_cmd 'ifconfig wlan0 down;  rmmod ndiswrapper;
+			 modprobe ndiswrapper;
+			 dmesg | grep ndiswrapper | tail -n 500'
+	    else
+		log_cmd 'ifconfig wlan0 down;  rmmod ndiswrapper;
+			 modprobe ndiswrapper;
+			 dmesg | grep ndiswrapper | tail -n 50'
+
+	    fi
+	    break
+	    ;;
+	n|N)
+	    log "Not reloading ndiswrapper..."
+	    log ""
+	    if [ $FULL -eq 1 ]; then
+		log_cmd 'dmesg | grep ndiswrapper | tail -n 100'
+	    else
+		log_cmd 'dmesg | grep ndiswrapper | tail -n 20'
+	    fi
+	    break
+	    ;;
+	*)
+	    echo "No input.. retry."
+	    ;;
+    esac
+done
+
+if [ $FULL -eq 1 ]; then
+    # module information
+    newblock
+
+    # pci devices
+    newblock
+    log "PCI devices:"
+    log_cmd "lspci -n"
+    log ""
+    log "USB devices:"
+    log_cmd "lsusb"
+    log ""
+
+    # try to get kernelconfig
+    newblock
+    log "kernel configuration:"
+    if [ -r /proc/config.gz ]; then
+	    log_cmd 'gzip -d < /proc/config.gz'
+    else
+	    if [ -r /lib/modules/$KVERS/build/.config ]; then
+		    log_cmd "cat /lib/modules/$KVERS/build/.config"
+	    else
+		    log "kernel config missing"
+	    fi
+    fi
+fi
+
+gzip -c $LOGFILE > /tmp/ndiswrapper-buginfo.gz
+
+echo "please attach /tmp/ndiswrapper-buginfo.gz to your bugreport!"
+\rm -f $LOGFILE
